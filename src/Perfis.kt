@@ -11,7 +11,7 @@ open class jogador(val nome: String, var qtdDinheiro: Int = 300, var posicao: In
     }
 
     override fun toString(): String {
-        return "${this.nome}"
+        return nome
     }
 
     //Se um usuário perder se torna inativo
@@ -24,49 +24,49 @@ open class jogador(val nome: String, var qtdDinheiro: Int = 300, var posicao: In
 
     //Todos jogadoree executaram a função abaixo toda rodada
     open fun jogada(casa: List<propriedade>, gerador: Int){
-        if(this.ativo) {
-            this.posicao = movimento(this.posicao, gerador)
-            if (casa[this.posicao].dono == null && casa[this.posicao].precoVenda <= this.qtdDinheiro) {
+        if(ativo) {
+            posicao = movimento(posicao, gerador)
+            if (casa[posicao].dono == null && casa[posicao].precoVenda <= qtdDinheiro) {
                 //Dependendo do tipo de jogador a sua forma especifica de comprar uma residencia é acionada
                 if(this is jogadorExigente){this.setDeCompa(casa)}
-                else if(this is jogadorAleatorio){this.setDeCompa(casa)}
-                else if(this is jogadorCauteloso){this.setDeCompa(casa)}
-                else if(this is jogadorImpulsivo){this.setDeCompa(casa)}
+                else if(this is jogadorAleatorio){setDeCompa(casa)}
+                else if(this is jogadorCauteloso){setDeCompa(casa)}
+                else if(this is jogadorImpulsivo){setDeCompa(casa)}
             } else if (casa[this.posicao].dono != null){
-                this.pagarAluguel(this, casa[this.posicao].precoAluguel, casa[this.posicao].dono)
+                pagarAluguel(this, casa[posicao].precoAluguel, casa[posicao].dono)
             }
             //Caso o jogador perder
-            if (this.qtdDinheiro < 0) {this.statusJogador(this, casa.filter { it.dono == this })}
+            if (qtdDinheiro < 0) {statusJogador(this, casa.filter { it.dono == this })}
         }
     }
 }
 
 class jogadorImpulsivo(nome: String) : jogador(nome){
-    fun setDeCompa(casa: List<propriedade>){this.modoDeComprar(casa[this.posicao].precoVenda,casa[this.posicao])    }
+    fun setDeCompa(casa: List<propriedade>){modoDeComprar(casa[posicao].precoVenda,casa[posicao])    }
     //Impulsivo compra em qualquer casa livre que passar
     fun modoDeComprar(preco: Int, dono: propriedade){
-        this.qtdDinheiro = this.qtdDinheiro - preco
+        qtdDinheiro = qtdDinheiro - preco
         dono.dono = this
     }
 }
 
 class jogadorExigente(nome: String) : jogador(nome){
-    fun setDeCompa(casa: List<propriedade>){this.modoDeComprar(casa[this.posicao].precoVenda, casa[this.posicao].precoAluguel, casa[this.posicao])}
+    fun setDeCompa(casa: List<propriedade>){modoDeComprar(casa[posicao].precoVenda, casa[posicao].precoAluguel, casa[posicao])}
     //Exigente só compra se o aluguel for maior que 50
     fun modoDeComprar(preco: Int, aluguel: Int, dono: propriedade){
         if(aluguel>50){
-            this.qtdDinheiro = this.qtdDinheiro - preco
+            qtdDinheiro = qtdDinheiro - preco
             dono.dono = this
         }
     }
 }
 
 class jogadorCauteloso(nome: String) : jogador(nome){
-    fun setDeCompa(casa: List<propriedade>){this.modoDeComprar(casa[this.posicao].precoVenda, casa[this.posicao] )}
+    fun setDeCompa(casa: List<propriedade>){modoDeComprar(casa[posicao].precoVenda, casa[posicao] )}
     //Cauteloso só o vlaor compra remanescente após a compra foir maior que 80
     fun modoDeComprar(preco: Int, dono: propriedade){
-        if((this.qtdDinheiro-preco)>=80){
-            this.qtdDinheiro = this.qtdDinheiro - preco
+        if((qtdDinheiro-preco)>=80){
+            qtdDinheiro = qtdDinheiro - preco
             dono.dono = this
         }
     }
@@ -74,11 +74,11 @@ class jogadorCauteloso(nome: String) : jogador(nome){
 
 class jogadorAleatorio(nome: String) : jogador(nome){
     val jogaAleatorio = SecureRandom()
-    fun setDeCompa(casa: List<propriedade>){this.modoDeComprar(casa[this.posicao].precoVenda,casa[this.posicao])}
+    fun setDeCompa(casa: List<propriedade>){modoDeComprar(casa[posicao].precoVenda,casa[posicao])}
     //Aleatório comra uma vez sim e outra vez não em cada casa livre que passar
     fun modoDeComprar(preco: Int, dono: propriedade){
         if(jogaAleatorio.nextBoolean()) {
-            this.qtdDinheiro = this.qtdDinheiro - preco
+            qtdDinheiro = qtdDinheiro - preco
             dono.dono = this
         }
     }
